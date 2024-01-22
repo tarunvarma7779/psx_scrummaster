@@ -3,12 +3,13 @@ package com.posidex.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.posidex.dao.TaskDAO;
 import com.posidex.entity.Task;
 
-@Service
+@Component
 public class TaskServiceImpl implements TaskService {
 
 	@Autowired

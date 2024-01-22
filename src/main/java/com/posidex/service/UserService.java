@@ -9,5 +9,7 @@ public interface UserService {
 	User getUserByUserName(String username);
 
 	List<User> getAllUsers();
+	
+	void addUser(User user);
 
 }
