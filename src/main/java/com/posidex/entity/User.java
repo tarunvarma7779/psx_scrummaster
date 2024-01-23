@@ -36,6 +36,8 @@ public class User {
 	private Date approvedOn;
 	@Column(name = "active")
 	private String active;
+	@Column(name = "gender")
+	private String gender;
 
 	public String getUserId() {
 		return userId;
@@ -133,17 +135,17 @@ public class User {
 		this.active = active;
 	}
 
-	@Override
-	public String toString() {
-		return "User [userId=" + userId + ", password=" + password + ", empId=" + empId + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", departmentName=" + departmentName + ", role=" + role + ", emailId="
-				+ emailId + ", reportingTo=" + reportingTo + ", createdOn=" + createdOn + ", approvedOn=" + approvedOn
-				+ ", active=" + active + "]";
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
 	public User(String userId, String password, String empId, String firstName, String lastName, String departmentName,
-			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, String active) {
-		super();
+			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, String active,
+			String gender) {
 		this.userId = userId;
 		this.password = password;
 		this.empId = empId;
@@ -156,6 +158,7 @@ public class User {
 		this.createdOn = createdOn;
 		this.approvedOn = approvedOn;
 		this.active = active;
+		this.gender = gender;
 	}
 
 	public User() {

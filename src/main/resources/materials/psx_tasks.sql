@@ -14,7 +14,7 @@ CREATE TABLE `psx_tasks` (
   `assigned_by` varchar(45) DEFAULT NULL,
   `assigned_to` varchar(45) DEFAULT NULL,
   `priority` varchar(1) DEFAULT NULL,
-  `status` varchar(45) DEFAULT NULL,
+  `active` varchar(45) DEFAULT NULL,
   `created_on` date DEFAULT NULL,
   `closed_on` date DEFAULT NULL,
   PRIMARY KEY (`id`)
