@@ -38,8 +38,6 @@ public class BeanDefinitionConfig {
 		} else {
 			basicDataSource.setDefaultAutoCommit(Boolean.parseBoolean(environment.getProperty("enableAutocommit")));
 		}
-//		basicDataSource.setMaxTotal(Integer.parseInt(environment.getProperty("maxTotalTime")));
-//		basicDataSource.setMaxIdle(environment.getProperty("maxIdleTime"));
 		return basicDataSource;
 	}
 

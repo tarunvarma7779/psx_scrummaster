@@ -49,7 +49,7 @@ public class StringEncrypter {
 			throw new EncryptionException(e);
 		}
 	}
-
+	
 	/**
 	 * The Class EncryptionException.
 	 */
