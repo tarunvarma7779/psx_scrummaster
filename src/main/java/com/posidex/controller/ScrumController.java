@@ -1,6 +1,7 @@
 package com.posidex.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,42 +21,42 @@ import com.posidex.service.UserService;
 public class ScrumController {
 
 	@Autowired
-	private TaskService ts;
+	private TaskService taskService;
 	@Autowired
-	private UserService us;
+	private UserService userService;
 
-	public ScrumController(TaskService taskService, UserService userService) {
-		this.ts = taskService;
-		this.us = userService;
+	@PostMapping("/login")
+	public String validateLogin(@RequestBody Map<String,Object> dataMap) {
+		return null;
 	}
-
+	
 	@GetMapping("/getTasks")
 	public List<Task> getTasks(){
-		return ts.getAllTasks();
+		return taskService.getAllTasks();
 	}
 	
 	@GetMapping("/getTask")
 	public Task getTask(@RequestParam int id) {
-		return ts.getTaskById(id);
+		return taskService.getTaskById(id);
 	}
 	
 	@DeleteMapping("/deleteTask")
 	public void deleteTask(@RequestParam int id) {
-		ts.deleteTaskById(id);
+		taskService.deleteTaskById(id);
 	}
 	
 	@PostMapping("/addTask")
 	public void addTask(@RequestBody Task task) {
-		ts.addTask(task);
+		taskService.addTask(task);
 	}
 	
 	@GetMapping("/getUser")
 	public User getUser(@RequestParam String username) {
-		return us.getUserByUserName(username);
+		return userService.getUserByUserName(username);
 	}
 	
 	@GetMapping("/getUsers")
 	public List<User> getUsers(){
-		return us.getAllUsers();
+		return userService.getAllUsers();
 	}
 }

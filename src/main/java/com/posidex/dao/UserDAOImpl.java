@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import com.posidex.entity.User;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-@Configuration
+import jakarta.transaction.Transactional;
+@Component
 public class UserDAOImpl implements UserDAO {
 
 	@Autowired
@@ -28,6 +30,11 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public User getUserByUsername(String username) {
 		return entityManager.find(User.class, username);
+	}
+	@Transactional
+	@Override
+	public void addUser(User user) {
+		entityManager.persist(user);
 	}
 
 }
