@@ -1,37 +1,39 @@
 package com.posidex.service;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import com.posidex.dao.UserDAO;
 import com.posidex.entity.User;
+import com.posidex.repository.UserRepository;
 
-@Component
-public class UserServiceImpl implements UserService {
+import jakarta.transaction.Transactional;
+
+@Service
+public class UserServiceImpl implements UserServiceI {
 
 	@Autowired
-	private UserDAO userDAO;
+	private UserRepository userRepository;
 
-	public UserServiceImpl(UserDAO ud) {
-		this.userDAO = ud;
-	}
+//	public UserServiceImpl(UserDAO ud) {
+//		this.userDAO = ud;
+//	}
 
 	@Override
 	public User getUserByUserName(String username) {
-		return userDAO.getUserByUsername(username);
+		Optional<User> result = userRepository.findById(username);
+		User user = null;
+		if (result.isPresent()) {
+			user = result.get();
+		}
+		return user;
 	}
 
-	@Override
-	public List<User> getAllUsers() {
-		return userDAO.getUserList();
-	}
-
+	@Transactional
 	@Override
 	public void addUser(User user) {
-		userDAO.addUser(user);
+		userRepository.save(user);
 	}
 
 }

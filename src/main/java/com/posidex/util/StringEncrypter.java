@@ -1,8 +1,5 @@
 package com.posidex.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -17,6 +14,9 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 public class StringEncrypter {
+
+	private StringEncrypter() {
+	}
 
 	public static final String initialVector = "AkhilChinnuBosss";
 	public static final String key = "7HDpF0SgQiWh81==";
