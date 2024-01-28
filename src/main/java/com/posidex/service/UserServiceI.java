@@ -2,9 +2,11 @@ package com.posidex.service;
 
 import java.sql.SQLException;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.posidex.entity.User;
 
-public interface UserServiceI {
+public interface UserServiceI extends UserDetailsService {
 
 	User getUserByUserName(String username);
 	

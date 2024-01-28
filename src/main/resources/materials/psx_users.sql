@@ -8,7 +8,7 @@ USE `scrummaster`;
 DROP TABLE IF EXISTS `psx_users`;
 
 CREATE TABLE `psx_users` (
-  `user_id` varchar(30) NOT NULL,
+  `username` varchar(30) NOT NULL,
   `password`varchar(255) NOT NULL,
   `emp_id`varchar(10) NOT NULL unique,
   `first_name` varchar(50) NOT NULL,
@@ -21,5 +21,5 @@ CREATE TABLE `psx_users` (
   `created_on`datetime NOT NULL,
   `approved_on`datetime default NULL,
   `active`varchar(1) NOT NULL check(active in ('Y','N')),
-  PRIMARY KEY (`user_id`)
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;

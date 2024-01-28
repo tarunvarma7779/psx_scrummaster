@@ -1,7 +1,5 @@
 package com.posidex.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.posidex.dto.JwtRequest;
+import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
 import com.posidex.entity.User;
 import com.posidex.util.LoginUtils;
@@ -23,13 +23,13 @@ public class LoginController {
 	private LoginUtils loginUtils;
 
 	@PostMapping("/validateLogin")
-	public String validateLogin(@RequestBody Map<String, String> dataMap) throws EncryptionException {
-		return loginUtils.validateLoginUser(dataMap);
+	public JwtResponse validateLogin(@RequestBody JwtRequest request) throws EncryptionException {
+		return loginUtils.validateLoginUser(request);
 	}
 
 	@PostMapping("/createUser")
 	public ResponseDTO createUser(@RequestBody User user) {
-		ResponseDTO responseDTO = new ResponseDTO();
-		return loginUtils.validateCreateUser(user, responseDTO);
+		return loginUtils.validateCreateUser(user);
 	}
+
 }

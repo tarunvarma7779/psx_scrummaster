@@ -1,13 +1,14 @@
 package com.posidex;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.posidex.util.StringEncrypter;
 
 @SpringBootTest
 class ScrumMasterApplicationTests {
 
-	@Test
-	void contextLoads() {
+	public static void main(String[] args) throws Exception {
+		System.out.println(StringEncrypter.decrypt("xwibIVA6C4ep2hPjFzXnMg=="));;
 	}
 
 }

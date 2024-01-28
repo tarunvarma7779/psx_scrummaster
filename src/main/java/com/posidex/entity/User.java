@@ -1,6 +1,12 @@
 package com.posidex.entity;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,11 +15,11 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "psx_users")
-public class User {
+public class User implements UserDetails{
 
 	@Id
-	@Column(name = "user_id")
-	private String userId;
+	@Column(name = "username")
+	private String username;
 	@Column(name = "password")
 	private String password;
 	@Column(name = "emp_id")
@@ -38,13 +44,13 @@ public class User {
 	private String active;
 	@Column(name = "gender")
 	private String gender;
-
-	public String getUserId() {
-		return userId;
+	
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
@@ -146,7 +152,7 @@ public class User {
 	public User(String userId, String password, String empId, String firstName, String lastName, String departmentName,
 			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, String active,
 			String gender) {
-		this.userId = userId;
+		this.username = userId;
 		this.password = password;
 		this.empId = empId;
 		this.firstName = firstName;
@@ -163,6 +169,31 @@ public class User {
 
 	public User() {
 		super();
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(role));
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }

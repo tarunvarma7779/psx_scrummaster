@@ -1,12 +1,12 @@
 package com.posidex.util;
 
 import java.util.Date;
-import java.util.Map;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.posidex.dto.JwtRequest;
+import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
 import com.posidex.entity.User;
 import com.posidex.entity.UserOps;
@@ -18,65 +18,78 @@ import com.posidex.util.StringEncrypter.EncryptionException;
 @Component
 public class LoginUtils {
 
-	private static Logger logger = Logger.getLogger(LoginUtils.class.getName());
-	private static final String success = "SUCCESS";
-	private static final String failed = "FAILED";
-	
+	private static final String SUCCESS = "SUCCESS";
+	private static final String FAILED = "FAILED";
+	private static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
+	private static final String LOGIN_FAILED = "LOGIN_FAILED";
+
 	@Autowired
 	private UserServiceI userService;
 	@Autowired
 	private UserOpsServiceI userOpsService;
+	@Autowired
+	private JwtUtils jwtUtils;
 
-	public String validateLoginUser(Map<String, String> dataMap) throws EncryptionException {
-		User user = userService.getUserByUserName(dataMap.get("username"));
+	public JwtResponse validateLoginUser(JwtRequest request) throws EncryptionException {
+		JwtResponse response = new JwtResponse();
+		User user = userService.getUserByUserName(request.getUsername());
 		if (user != null) {
-			if (StringEncrypter.decrypt(user.getPassword()).equals(dataMap.get("password"))) {
-				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(dataMap.get("username"), new Date()),
-						"LOGIN_SUCCESS", user.getRole()));
-				return "Login Successfull";
+			if (StringEncrypter.decrypt(user.getPassword()).equals(request.getPassword())) {
+				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),
+						LOGIN_SUCCESS, user.getRole()));
+				response.setJwtToken(jwtUtils.generateToken(user));
+				response.setStatusCode(200);
+				response.setMessage(LOGIN_SUCCESS);
+				response.setUser(user);				
+				return response;
 			} else {
-				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(dataMap.get("username"), new Date()),
-						"LOGIN_FAILED", user.getRole()));
-				return "Incorrect Password";
+				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),
+						LOGIN_FAILED, user.getRole()));
+				response.setJwtToken(null);
+				response.setStatusCode(430);
+				response.setMessage(LOGIN_FAILED);
+				response.setUser(null);
+				return response;
 			}
 		} else {
 			userOpsService.addUserOps(
-					new UserOps(new UserOpsIdentity(dataMap.get("username"), new Date()), "LOGIN_FAILED", "Invalid"));
-			return "Invalid Username";
+					new UserOps(new UserOpsIdentity(request.getUsername(), new Date()), LOGIN_FAILED, "Invalid"));
+			response.setJwtToken(null);
+			response.setStatusCode(440);
+			response.setMessage(LOGIN_FAILED);
+			response.setUser(null);
+			return response;
 		}
 	}
 
-	public ResponseDTO validateCreateUser(User user, ResponseDTO responseDTO) {
+	public ResponseDTO validateCreateUser(User user) {
+		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			boolean userExists = userService.userExists(user.getUserId());
+			boolean userExists = userService.userExists(user.getUsername());
 			boolean empIdExists = userService.empIdExists(user.getEmpId());
-			if (userExists||empIdExists) {
-				if(userExists) {
+			if (userExists || empIdExists) {
+				if (userExists) {
 					responseDTO.setMessage("UserId already exists");
-					responseDTO.setStatus(failed);
+					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(410);
 					return responseDTO;
-				}
-				else if(empIdExists) {
+				} else {
 					responseDTO.setMessage("EmpId already exists");
-					responseDTO.setStatus(failed);
+					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(420);
 					return responseDTO;
-				}				
+				}
 			}
-			try {
-				String encryptedPassword = StringEncrypter.encrypt(user.getPassword());
-				user.setPassword(encryptedPassword);
-			} catch (EncryptionException e) {
-				logger.info("password already encrypted");
+			if (StringEncrypter.isPasswordDecrypted(user.getPassword())) {
+				user.setPassword(StringEncrypter.encrypt(user.getPassword()));
 			}
 			userService.addUser(user);
 			responseDTO.setMessage("User Added Successfully");
-			responseDTO.setStatus(success);
+			responseDTO.setStatus(SUCCESS);
 			responseDTO.setStatusCode(200);
 		} catch (Exception e) {
 			responseDTO.setMessage(e.getLocalizedMessage());
-			responseDTO.setStatus(failed);
+			responseDTO.setStatus(FAILED);
 			responseDTO.setStatusCode(100);
 			return responseDTO;
 		}
