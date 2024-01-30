@@ -15,7 +15,7 @@
 	<name>ScrumMaster</name>
 	<description>The ScrumMaster tool</description>
 	<properties>
-		<java.version>8</java.version>
+		<java.version>17</java.version>
 		<start-class>com.posidex.ScrumMasterApplication</start-class>
 	</properties>
 	<dependencies>
