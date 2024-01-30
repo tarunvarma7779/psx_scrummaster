@@ -14,7 +14,6 @@ import com.posidex.entity.User;
 import com.posidex.util.LoginUtils;
 import com.posidex.util.StringEncrypter.EncryptionException;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/login")
 @RestController
 public class LoginController {
