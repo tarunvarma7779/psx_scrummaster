@@ -67,16 +67,22 @@ public class LoginUtils {
 		try {
 			boolean userExists = userService.userExists(user.getUsername());
 			boolean empIdExists = userService.empIdExists(user.getEmpId());
-			if (userExists || empIdExists) {
+			boolean reportingIdExists = userService.userExists(user.getReportingTo());
+			if (userExists || empIdExists || !reportingIdExists) {
 				if (userExists) {
 					responseDTO.setMessage("UserId already exists");
 					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(410);
 					return responseDTO;
-				} else {
+				} else if(empIdExists) {
 					responseDTO.setMessage("EmpId already exists");
 					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(420);
+					return responseDTO;
+				} else {
+					responseDTO.setMessage("Reporting id doesnt exists");
+					responseDTO.setStatus(FAILED);
+					responseDTO.setStatusCode(450);
 					return responseDTO;
 				}
 			}
