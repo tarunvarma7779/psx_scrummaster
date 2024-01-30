@@ -34,26 +34,33 @@ public class LoginUtils {
 		JwtResponse response = new JwtResponse();
 		User user = userService.getUserByUserName(request.getUsername());
 		if (user != null) {
-			if (StringEncrypter.decrypt(user.getPassword()).equals(request.getPassword())) {
-				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),
-						LOGIN_SUCCESS, user.getRole()));
-				response.setJwtToken(jwtUtils.generateToken(user));
-				response.setStatusCode(200);
-				response.setMessage(LOGIN_SUCCESS);
-				response.setUser(user);				
-				return response;
-			} else {
-				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),
-						LOGIN_FAILED, user.getRole()));
+			if(user.getActive().equals("Y")) {
+				if (StringEncrypter.decrypt(user.getPassword()).equals(request.getPassword())) {
+					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_SUCCESS, user.getRole()));
+					response.setJwtToken(jwtUtils.generateToken(user));
+					response.setStatusCode(200);
+					response.setMessage(LOGIN_SUCCESS);
+					response.setUser(user);				
+					return response;
+				} else {
+					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
+					response.setJwtToken(null);
+					response.setStatusCode(430);
+					response.setMessage(LOGIN_FAILED);
+					response.setUser(null);
+					return response;
+				}
+			}
+			else {
+				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
 				response.setJwtToken(null);
-				response.setStatusCode(430);
+				response.setStatusCode(460);
 				response.setMessage(LOGIN_FAILED);
 				response.setUser(null);
 				return response;
-			}
+			}			
 		} else {
-			userOpsService.addUserOps(
-					new UserOps(new UserOpsIdentity(request.getUsername(), new Date()), LOGIN_FAILED, "Invalid"));
+			userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()), LOGIN_FAILED, "Invalid"));
 			response.setJwtToken(null);
 			response.setStatusCode(440);
 			response.setMessage(LOGIN_FAILED);
