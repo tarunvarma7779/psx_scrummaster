@@ -41,7 +41,9 @@ public class User implements UserDetails{
 	@Column(name = "approved_on")
 	private Date approvedOn;
 	@Column(name = "active")
-	private String active;
+	private int active;
+	@Column(name = "locked")
+	private int locked;
 	@Column(name = "gender")
 	private String gender;
 	
@@ -133,12 +135,20 @@ public class User implements UserDetails{
 		this.approvedOn = approvedOn;
 	}
 
-	public String getActive() {
+	public int getActive() {
 		return active;
 	}
 
-	public void setActive(String active) {
+	public void setActive(int active) {
 		this.active = active;
+	}
+	
+	public int getlocked() {
+		return locked;
+	}
+
+	public void setlocked(int suspended) {
+		this.locked = suspended;
 	}
 
 	public String getGender() {
@@ -148,9 +158,9 @@ public class User implements UserDetails{
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-
+	
 	public User(String userId, String password, String empId, String firstName, String lastName, String departmentName,
-			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, String active,
+			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, int active,int locked,
 			String gender) {
 		this.username = userId;
 		this.password = password;
@@ -164,6 +174,7 @@ public class User implements UserDetails{
 		this.createdOn = createdOn;
 		this.approvedOn = approvedOn;
 		this.active = active;
+		this.locked=locked;
 		this.gender = gender;
 	}
 

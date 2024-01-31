@@ -34,19 +34,19 @@ public class LoginUtils {
 		JwtResponse response = new JwtResponse();
 		User user = userService.getUserByUserName(request.getUsername());
 		if (user != null) {
-			if(user.getActive().equals("Y")) {
+			if(user.getActive()==1) {
 				if (StringEncrypter.decrypt(user.getPassword()).equals(request.getPassword())) {
 					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_SUCCESS, user.getRole()));
 					response.setJwtToken(jwtUtils.generateToken(user));
 					response.setStatusCode(200);
-					response.setMessage(LOGIN_SUCCESS);
+					response.setMessage("Logged successfully");
 					response.setUser(user);				
 					return response;
 				} else {
 					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
 					response.setJwtToken(null);
 					response.setStatusCode(430);
-					response.setMessage(LOGIN_FAILED);
+					response.setMessage("Incorrect Password");
 					response.setUser(null);
 					return response;
 				}
@@ -55,7 +55,7 @@ public class LoginUtils {
 				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
 				response.setJwtToken(null);
 				response.setStatusCode(460);
-				response.setMessage(LOGIN_FAILED);
+				response.setMessage("User Not Activated");
 				response.setUser(null);
 				return response;
 			}			
@@ -63,7 +63,7 @@ public class LoginUtils {
 			userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()), LOGIN_FAILED, "Invalid"));
 			response.setJwtToken(null);
 			response.setStatusCode(440);
-			response.setMessage(LOGIN_FAILED);
+			response.setMessage("Invalid Credentials");
 			response.setUser(null);
 			return response;
 		}
