@@ -22,30 +22,31 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-	
+
 	@Autowired
 	private JwtUtils jwtUtility;
-	
+
 	@Autowired
 	private UserServiceI userService;
-	
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		final String authHeader = request.getHeader("Authorization");
-		final String jwt; 
+		final String jwt;
 		final String username;
-		if(StringUtils.isEmpty(authHeader)||org.apache.commons.lang3.StringUtils.startsWith(authHeader, "Bearer ")) {
+		if (StringUtils.isEmpty(authHeader) || org.apache.commons.lang3.StringUtils.startsWith(authHeader, "Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		jwt = authHeader.substring(7);
-		username=jwtUtility.getUsernameFromToken(jwt);
-		if(StringUtils.isNotEmpty(username)&&SecurityContextHolder.getContext().getAuthentication()==null) {
+		username = jwtUtility.getUsernameFromToken(jwt);
+		if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = userService.loadUserByUsername(username);
-			if(Boolean.TRUE.equals(jwtUtility.validateToken(jwt, userDetails))) {
+			if (Boolean.TRUE.equals(jwtUtility.validateToken(jwt, userDetails))) {
 				SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-				UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, null,userDetails.getAuthorities());
+				UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, null,
+						userDetails.getAuthorities());
 				token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				securityContext.setAuthentication(token);
 				SecurityContextHolder.setContext(securityContext);

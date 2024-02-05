@@ -29,7 +29,7 @@ public class StringEncrypter {
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
 			byte[] encrypted = cipher.doFinal(value.getBytes());
 			return DatatypeConverter.printBase64Binary(encrypted);
-		} catch ( NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
 			throw new EncryptionException(e);
 		}
@@ -44,7 +44,7 @@ public class StringEncrypter {
 			byte[] message = cipher.doFinal(DatatypeConverter.parseBase64Binary(encrypted));
 			return new String(message);
 
-		} catch ( NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
 			throw new EncryptionException(e);
 		}

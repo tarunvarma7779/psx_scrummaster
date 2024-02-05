@@ -1,8 +1,14 @@
 package com.posidex.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.posidex.dto.JwtRequest;
@@ -18,10 +24,14 @@ import com.posidex.util.StringEncrypter.EncryptionException;
 @Component
 public class LoginUtils {
 
-	private static final String SUCCESS = "SUCCESS";
-	private static final String FAILED = "FAILED";
-	private static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
-	private static final String LOGIN_FAILED = "LOGIN_FAILED";
+	public static final String SUCCESS = "SUCCESS";
+	public static final String FAILED = "FAILED";
+	public static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
+	public static final String LOGIN_FAILED = "LOGIN_FAILED";
+	public static final String LOGOUT = "LOGOUT";
+	public static final String INVALID = "INVALID";
+
+	private static Logger logger = Logger.getLogger(LoginUtils.class.getName());
 
 	@Autowired
 	private UserServiceI userService;
@@ -29,44 +39,110 @@ public class LoginUtils {
 	private UserOpsServiceI userOpsService;
 	@Autowired
 	private JwtUtils jwtUtils;
+	@Autowired
+	private Environment environment;
 
-	public JwtResponse validateLoginUser(JwtRequest request) throws EncryptionException {
+	public Object[] getRecentUnSuccessfulLogInAttempts(String username) {
+		List<UserOps> userOpsList = userOpsService.getUserOpsByUsername(username);
+		Collections.sort(userOpsList, new Comparator<UserOps>() {
+			@Override
+			public int compare(UserOps o1, UserOps o2) {
+				return (o2.getUserOpsIdentity().getOperationTime()
+						.compareTo(o1.getUserOpsIdentity().getOperationTime()));
+			}
+		});
+		List<UserOps> lastUnsuccessful = new ArrayList<>();
+		for (UserOps op : userOpsList) {
+			if (op.getOperationType().equals(LoginUtils.LOGOUT)
+					|| op.getOperationType().equals(LoginUtils.LOGIN_SUCCESS)) {
+				break;
+			} else {
+				lastUnsuccessful.add(op);
+			}
+		}
+		return new Object[] { lastUnsuccessful.size() + 1 };
+	}
+
+	public Long getRecentUnSuccessfulLogInTime(String username) {
+		List<UserOps> userOpsList = userOpsService.getUserOpsByUsername(username);
+		Collections.sort(userOpsList, new Comparator<UserOps>() {
+			@Override
+			public int compare(UserOps o1, UserOps o2) {
+				return (o2.getUserOpsIdentity().getOperationTime()
+						.compareTo(o1.getUserOpsIdentity().getOperationTime()));
+			}
+		});
+		for (UserOps op : userOpsList) {
+			if (op.getOperationType().equals(LoginUtils.LOGIN_FAILED)) {
+				return op.getUserOpsIdentity().getOperationTime().getTime();
+			}
+		}
+		return null;
+	}
+
+	public JwtResponse loginUser(JwtRequest request) {
 		JwtResponse response = new JwtResponse();
+		UserOpsIdentity userOpsIdentity = new UserOpsIdentity(request.getUsername(), new Date());
+		UserOps userOps = new UserOps();
+		userOps.setUserOpsIdentity(userOpsIdentity);
 		User user = userService.getUserByUserName(request.getUsername());
 		if (user != null) {
-			if(user.getActive()==1) {
-				if (StringEncrypter.decrypt(user.getPassword()).equals(request.getPassword())) {
-					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_SUCCESS, user.getRole()));
-					response.setJwtToken(jwtUtils.generateToken(user));
-					response.setStatusCode(200);
-					response.setMessage("Logged successfully");
-					response.setUser(user);				
-					return response;
-				} else {
-					userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
-					response.setJwtToken(null);
-					response.setStatusCode(430);
-					response.setMessage("Incorrect Password");
-					response.setUser(null);
-					return response;
-				}
-			}
-			else {
-				userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()),LOGIN_FAILED, user.getRole()));
-				response.setJwtToken(null);
-				response.setStatusCode(460);
-				response.setMessage("User Not Activated");
-				response.setUser(null);
-				return response;
-			}			
+			validateUserCredentials(user, request, response, userOps);
 		} else {
-			userOpsService.addUserOps(new UserOps(new UserOpsIdentity(request.getUsername(), new Date()), LOGIN_FAILED, "Invalid"));
+			userOps.setOperationType(LOGIN_FAILED);
+			userOps.setRole(INVALID);
+			userOpsService.addUserOps(userOps);
 			response.setJwtToken(null);
-			response.setStatusCode(440);
-			response.setMessage("Invalid Credentials");
+			response.setMessage("Invalid Username");
+			response.setStatusCode(520);
 			response.setUser(null);
-			return response;
 		}
+		return response;
+	}
+
+	private void validateUserCredentials(User user, JwtRequest request, JwtResponse response, UserOps userOps) {
+		long disableLoginMillis = Long.parseLong(environment.getProperty("disableLoginMillis"));
+		final String token = jwtUtils.generateToken(user);
+		Object[] array = getRecentUnSuccessfulLogInAttempts(user.getUsername());
+		int loginAttempt = (int) array[0];
+		Long timeFromLastInvalidLogin = (loginAttempt > 1)
+				? (jwtUtils.getGenerationDateFromToken(token).getTime()
+						- getRecentUnSuccessfulLogInTime(user.getUsername()))
+				: 30001l;
+		if ((loginAttempt > 3) && timeFromLastInvalidLogin < disableLoginMillis) {
+			response.setJwtToken(null);
+			response.setMessage("Wait for " + (disableLoginMillis - timeFromLastInvalidLogin) / 1000 + " secs");
+			response.setStatusCode(530);
+			response.setUser(null);
+		} else {
+			if (validatePassword(request.getPassword(), user)) {
+				userOps.setOperationType(LOGIN_SUCCESS);
+				userOps.setRole(user.getRole());
+				userOpsService.addUserOps(userOps);
+				response.setJwtToken(token);
+				response.setMessage("Logged Successfully");
+				response.setStatusCode(200);
+				response.setUser(user);
+			} else {
+				userOps.setOperationType(LOGIN_FAILED);
+				userOps.setRole(user.getRole());
+				userOpsService.addUserOps(userOps);
+				response.setJwtToken(null);
+				response.setMessage("Password Incorrect " + loginAttempt + " time");
+				response.setStatusCode(510);
+				response.setUser(null);
+			}
+		}
+	}
+
+	private boolean validatePassword(String password, User user) {
+		String userPassword = user.getPassword();
+		try {
+			userPassword = StringEncrypter.decrypt(userPassword);
+		} catch (EncryptionException e) {
+			logger.info("Password already decrypted");
+		}
+		return password.equals(userPassword);
 	}
 
 	public ResponseDTO validateCreateUser(User user) {
@@ -81,7 +157,7 @@ public class LoginUtils {
 					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(410);
 					return responseDTO;
-				} else if(empIdExists) {
+				} else if (empIdExists) {
 					responseDTO.setMessage("EmpId already exists");
 					responseDTO.setStatus(FAILED);
 					responseDTO.setStatusCode(420);
@@ -89,7 +165,7 @@ public class LoginUtils {
 				} else {
 					responseDTO.setMessage("Reporting id doesnt exists");
 					responseDTO.setStatus(FAILED);
-					responseDTO.setStatusCode(450);
+					responseDTO.setStatusCode(430);
 					return responseDTO;
 				}
 			}

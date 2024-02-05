@@ -1,0 +1,7 @@
+{"properties": [
+  {
+    "name": "disableLoginMillis",
+    "type": "java.lang.String",
+    "description": "A time period for disabling login on consecutive invalid attempts"
+  }
+]}

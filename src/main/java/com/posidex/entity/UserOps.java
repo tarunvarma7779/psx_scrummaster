@@ -12,15 +12,9 @@ public class UserOps {
 	@EmbeddedId
 	private UserOpsIdentity userOpsIdentity;
 	@Column(name = "operation_type")
-	String operationType;
+	private String operationType;
 	@Column(name = "role")
-	String role;
-
-	@Override
-	public String toString() {
-		return "UserOps [userOpsIdentity=" + userOpsIdentity + ", OperationType=" + operationType + ", role=" + role
-				+ "]";
-	}
+	private String role;
 
 	public UserOpsIdentity getUserOpsIdentity() {
 		return userOpsIdentity;
@@ -56,4 +50,11 @@ public class UserOps {
 	public UserOps() {
 		super();
 	}
+
+	@Override
+	public String toString() {
+		return "UserOps [userOpsIdentity=" + userOpsIdentity + ", operationType=" + operationType + ", role=" + role
+				+ "]";
+	}
+
 }

@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "psx_users")
-public class User implements UserDetails{
+public class User implements UserDetails {
 
 	@Id
 	@Column(name = "username")
@@ -46,7 +46,7 @@ public class User implements UserDetails{
 	private int locked;
 	@Column(name = "gender")
 	private String gender;
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -142,7 +142,7 @@ public class User implements UserDetails{
 	public void setActive(int active) {
 		this.active = active;
 	}
-	
+
 	public int getlocked() {
 		return locked;
 	}
@@ -158,9 +158,9 @@ public class User implements UserDetails{
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	
+
 	public User(String userId, String password, String empId, String firstName, String lastName, String departmentName,
-			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, int active,int locked,
+			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, int active, int locked,
 			String gender) {
 		this.username = userId;
 		this.password = password;
@@ -174,7 +174,7 @@ public class User implements UserDetails{
 		this.createdOn = createdOn;
 		this.approvedOn = approvedOn;
 		this.active = active;
-		this.locked=locked;
+		this.locked = locked;
 		this.gender = gender;
 	}
 

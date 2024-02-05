@@ -8,25 +8,25 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class UserOpsIdentity {
 
-	@Column(name = "user_id")
-	private String userID;
+	@Column(name = "username")
+	private String username;
 	@Column(name = "operation_time")
 	private Date operationTime;
 
 	public UserOpsIdentity() {
 	}
 
-	public UserOpsIdentity(String userID, Date operationTime) {
-		this.userID = userID;
+	public UserOpsIdentity(String username, Date operationTime) {
+		this.username = username;
 		this.operationTime = operationTime;
 	}
 
-	public String getUserID() {
-		return userID;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserID(String userID) {
-		this.userID = userID;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Date getOperationTime() {

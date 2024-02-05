@@ -1,5 +1,7 @@
 package com.posidex.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,11 @@ public class UserOpsServiceImpl implements UserOpsServiceI {
 	@Override
 	public void addUserOps(UserOps userOps) {
 		userOpsRepository.save(userOps);
+	}
+
+	@Override
+	public List<UserOps> getUserOpsByUsername(String username) {
+		return userOpsRepository.findByUserOpsIdentityUsername(username);
 	}
 
 }

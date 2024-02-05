@@ -9,7 +9,7 @@ import com.posidex.entity.User;
 public interface UserServiceI extends UserDetailsService {
 
 	User getUserByUserName(String username);
-	
+
 	boolean empIdExists(String empId) throws SQLException;
 
 	void addUser(User user);

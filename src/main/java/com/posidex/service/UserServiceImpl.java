@@ -22,9 +22,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserServiceI {
-	
+
 	private Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
-	
+
 	@Autowired
 	private UserRepository userRepository;
 
@@ -34,11 +34,10 @@ public class UserServiceImpl implements UserServiceI {
 	@Override
 	public User getUserByUserName(String username) {
 		Optional<User> result = userRepository.findById(username);
-		User user = null;
 		if (result.isPresent()) {
-			user = result.get();
+			return result.get();
 		}
-		return user;
+		return null;
 	}
 
 	@Transactional
@@ -55,9 +54,9 @@ public class UserServiceImpl implements UserServiceI {
 	@Override
 	public boolean empIdExists(String empId) throws SQLException {
 		try (Connection con = dataSource.getConnection();
-				PreparedStatement ps = con.prepareStatement("select * from psx_users where emp_id = '"+empId+"'");
-				ResultSet rs=ps.executeQuery();) {
-			if(rs.next()) {
+				PreparedStatement ps = con.prepareStatement("select * from psx_users where emp_id = '" + empId + "'");
+				ResultSet rs = ps.executeQuery();) {
+			if (rs.next()) {
 				return true;
 			}
 		}
@@ -66,14 +65,14 @@ public class UserServiceImpl implements UserServiceI {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
+
 		User user = getUserByUserName(username);
 		try {
 			user.setPassword(StringEncrypter.decrypt(user.getPassword()));
-		}catch (EncryptionException e) {
+		} catch (EncryptionException e) {
 			logger.info("Password already decrypted");
 		}
-        return user;
+		return user;
 	}
 
 }
