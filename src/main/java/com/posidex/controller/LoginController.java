@@ -26,7 +26,7 @@ public class LoginController {
 
 	@PostMapping("/createUser")
 	public ResponseDTO createUser(@RequestBody User user) {
-		return loginUtils.validateCreateUser(user);
+		return loginUtils.createUser(user);
 	}
 
 }

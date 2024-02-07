@@ -14,9 +14,11 @@ import org.springframework.stereotype.Component;
 import com.posidex.dto.JwtRequest;
 import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
+import com.posidex.entity.Request;
 import com.posidex.entity.User;
 import com.posidex.entity.UserOps;
 import com.posidex.entity.UserOpsIdentity;
+import com.posidex.service.RequestServiceI;
 import com.posidex.service.UserOpsServiceI;
 import com.posidex.service.UserServiceI;
 import com.posidex.util.StringEncrypter.EncryptionException;
@@ -26,10 +28,11 @@ public class LoginUtils {
 
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILED = "FAILED";
-	public static final String LOGIN_SUCCESS = "LOGIN_SUCCESS";
-	public static final String LOGIN_FAILED = "LOGIN_FAILED";
+	public static final String LOGIN_SUCCESS = "LOGIN SUCCESS";
+	public static final String LOGIN_FAILED = "LOGIN FAILED";
 	public static final String LOGOUT = "LOGOUT";
 	public static final String INVALID = "INVALID";
+	public static final String USER_ACTIVATION = "USER ACTIVATION";
 
 	private static Logger logger = Logger.getLogger(LoginUtils.class.getName());
 
@@ -37,6 +40,8 @@ public class LoginUtils {
 	private UserServiceI userService;
 	@Autowired
 	private UserOpsServiceI userOpsService;
+	@Autowired
+	private RequestServiceI requestService;
 	@Autowired
 	private JwtUtils jwtUtils;
 	@Autowired
@@ -86,15 +91,16 @@ public class LoginUtils {
 		UserOps userOps = new UserOps();
 		userOps.setUserOpsIdentity(userOpsIdentity);
 		User user = userService.getUserByUserName(request.getUsername());
-		if (user != null) {
+		if (user != null && user.getActive() == 1) {
 			validateUserCredentials(user, request, response, userOps);
 		} else {
 			userOps.setOperationType(LOGIN_FAILED);
-			userOps.setRole(INVALID);
+			userOps.setRole((user != null && user.getActive() == 0) ? user.getRole() : INVALID);
 			userOpsService.addUserOps(userOps);
 			response.setJwtToken(null);
-			response.setMessage("Invalid Username");
-			response.setStatusCode(520);
+			response.setMessage(
+					(user != null && user.getActive() == 0) ? "Username not activated" : "Invalid Username");
+			response.setStatusCode((user != null && user.getActive() == 0) ? 540 : 520);
 			response.setUser(null);
 		}
 		return response;
@@ -108,7 +114,7 @@ public class LoginUtils {
 		Long timeFromLastInvalidLogin = (loginAttempt > 1)
 				? (jwtUtils.getGenerationDateFromToken(token).getTime()
 						- getRecentUnSuccessfulLogInTime(user.getUsername()))
-				: 30001l;
+				: disableLoginMillis + 1;
 		if ((loginAttempt > 3) && timeFromLastInvalidLogin < disableLoginMillis) {
 			response.setJwtToken(null);
 			response.setMessage("Wait for " + (disableLoginMillis - timeFromLastInvalidLogin) / 1000 + " secs");
@@ -145,7 +151,7 @@ public class LoginUtils {
 		return password.equals(userPassword);
 	}
 
-	public ResponseDTO validateCreateUser(User user) {
+	public ResponseDTO createUser(User user) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
 			boolean userExists = userService.userExists(user.getUsername());
@@ -171,6 +177,16 @@ public class LoginUtils {
 			}
 			if (StringEncrypter.isPasswordDecrypted(user.getPassword())) {
 				user.setPassword(StringEncrypter.encrypt(user.getPassword()));
+			}
+			if(user.getActive()==0) {
+				Request request = new Request();
+				request.setRequestId("req_" + System.currentTimeMillis());
+				request.setRaisedBy(user.getUsername());
+				request.setRaisedTo(user.getReportingTo());
+				request.setOperationType(USER_ACTIVATION);
+				request.setOperationTime(new Date());
+				request.setActive(1);
+				requestService.addRequest(request);
 			}
 			userService.addUser(user);
 			responseDTO.setMessage("User Added Successfully");
