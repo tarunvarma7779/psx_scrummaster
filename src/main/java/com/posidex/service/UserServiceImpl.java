@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserServiceI {
 	@Override
 	public boolean empIdExists(String empId) throws SQLException {
 		try (Connection con = dataSource.getConnection();
-				PreparedStatement ps = con.prepareStatement("select * from scrum_users where emp_id = '" + empId + "'");
+				PreparedStatement ps = con.prepareStatement("select * from scrum_user_details where emp_id = '" + empId + "'");
 				ResultSet rs = ps.executeQuery();) {
 			if (rs.next()) {
 				return true;

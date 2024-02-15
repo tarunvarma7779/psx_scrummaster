@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.posidex.dto.CreateUserDTO;
 import com.posidex.dto.JwtRequest;
 import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
@@ -25,8 +26,8 @@ public class LoginController {
 	}
 
 	@PostMapping("/createUser")
-	public ResponseDTO createUser(@RequestBody User user) {
-		return loginUtils.createUser(user);
+	public ResponseDTO createUser(@RequestBody CreateUserDTO createUser) {
+		return loginUtils.createUser(createUser);
 	}
 
 }

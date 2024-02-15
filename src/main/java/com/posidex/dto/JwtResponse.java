@@ -1,12 +1,13 @@
 package com.posidex.dto;
 
 import com.posidex.entity.User;
+import com.posidex.entity.UserDetails;
 
 public class JwtResponse {
 	private String jwtToken;
 	private String message;
 	private int statusCode;
-	private User user;
+	private UserDetails userDetails;
 
 	public String getJwtToken() {
 		return jwtToken;
@@ -32,20 +33,20 @@ public class JwtResponse {
 		this.statusCode = statusCode;
 	}
 
-	public User getUser() {
-		return user;
+	public UserDetails getUserDetails() {
+		return userDetails;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserDetails (UserDetails userDetails) {
+		this.userDetails = userDetails;
 	}
 
-	public JwtResponse(String jwtToken, String message, int statusCode, User user) {
+	public JwtResponse(String jwtToken, String message, int statusCode, UserDetails userDetails) {
 		super();
 		this.jwtToken = jwtToken;
 		this.message = message;
 		this.statusCode = statusCode;
-		this.user = user;
+		this.userDetails = userDetails;
 	}
 
 	public JwtResponse() {
@@ -54,8 +55,8 @@ public class JwtResponse {
 
 	@Override
 	public String toString() {
-		return "JwtResponse [jwtToken=" + jwtToken + ", message=" + message + ", statusCode=" + statusCode + ", user="
-				+ user + "]";
+		return "JwtResponse [jwtToken=" + jwtToken + ", message=" + message + ", statusCode=" + statusCode + ", userDetails="
+				+ userDetails + "]";
 	}
 
 }

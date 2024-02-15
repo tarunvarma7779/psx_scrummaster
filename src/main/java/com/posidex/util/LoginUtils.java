@@ -11,14 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.posidex.dto.CreateUserDTO;
 import com.posidex.dto.JwtRequest;
 import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
 import com.posidex.entity.Request;
 import com.posidex.entity.User;
+import com.posidex.entity.UserDetails;
 import com.posidex.entity.UserOps;
 import com.posidex.entity.UserOpsIdentity;
 import com.posidex.service.RequestServiceI;
+import com.posidex.service.UserDetailsServiceI;
 import com.posidex.service.UserOpsServiceI;
 import com.posidex.service.UserServiceI;
 import com.posidex.util.StringEncrypter.EncryptionException;
@@ -38,6 +41,8 @@ public class LoginUtils {
 
 	@Autowired
 	private UserServiceI userService;
+	@Autowired
+	private UserDetailsServiceI userDetailsService;
 	@Autowired
 	private UserOpsServiceI userOpsService;
 	@Autowired
@@ -101,7 +106,7 @@ public class LoginUtils {
 			response.setMessage(
 					(user != null && user.getActive() == 0) ? "Username not activated" : "Invalid Username");
 			response.setStatusCode((user != null && user.getActive() == 0) ? 540 : 520);
-			response.setUser(null);
+			response.setUserDetails(null);
 		}
 		return response;
 	}
@@ -119,7 +124,7 @@ public class LoginUtils {
 			response.setJwtToken(null);
 			response.setMessage("Wait for " + (disableLoginMillis - timeFromLastInvalidLogin) / 1000 + " secs");
 			response.setStatusCode(530);
-			response.setUser(null);
+			response.setUserDetails(null);
 		} else {
 			if (validatePassword(request.getPassword(), user)) {
 				userOps.setOperationType(LOGIN_SUCCESS);
@@ -128,7 +133,7 @@ public class LoginUtils {
 				response.setJwtToken(token);
 				response.setMessage("Logged Successfully");
 				response.setStatusCode(200);
-				response.setUser(user);
+				response.setUserDetails(userDetailsService.getUserDetailsByUsername(user.getUsername()));
 			} else {
 				userOps.setOperationType(LOGIN_FAILED);
 				userOps.setRole(user.getRole());
@@ -136,7 +141,7 @@ public class LoginUtils {
 				response.setJwtToken(null);
 				response.setMessage("Password Incorrect " + loginAttempt + " time");
 				response.setStatusCode(510);
-				response.setUser(null);
+				response.setUserDetails(null);
 			}
 		}
 	}
@@ -151,12 +156,12 @@ public class LoginUtils {
 		return password.equals(userPassword);
 	}
 
-	public ResponseDTO createUser(User user) {
+	public ResponseDTO createUser(CreateUserDTO createUser) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		try {
-			boolean userExists = userService.userExists(user.getUsername());
-			boolean empIdExists = userService.empIdExists(user.getEmpId());
-			boolean reportingIdExists = userService.userExists(user.getReportingTo());
+			boolean userExists = userService.userExists(createUser.getUsername());
+			boolean empIdExists = userService.empIdExists(createUser.getEmpId());
+			boolean reportingIdExists = userService.userExists(createUser.getReportingTo());
 			if (userExists || empIdExists || !reportingIdExists) {
 				if (userExists) {
 					responseDTO.setMessage("UserId already exists");
@@ -175,20 +180,23 @@ public class LoginUtils {
 					return responseDTO;
 				}
 			}
-			if (StringEncrypter.isPasswordDecrypted(user.getPassword())) {
-				user.setPassword(StringEncrypter.encrypt(user.getPassword()));
+			if (StringEncrypter.isPasswordDecrypted(createUser.getPassword())) {
+				createUser.setPassword(StringEncrypter.encrypt(createUser.getPassword()));
 			}
-			if(user.getActive()==0) {
+			User user = fillUser(createUser);
+			UserDetails userDetails = fillUserDetails(createUser);
+			if (user.getActive() == 0) {
 				Request request = new Request();
 				request.setRequestId("req_" + System.currentTimeMillis());
-				request.setRaisedBy(user.getUsername());
-				request.setRaisedTo(user.getReportingTo());
+				request.setRaisedBy(userDetails.getEmpId());
+				request.setRaisedTo(userDetails.getReportingTo());
 				request.setOperationType(USER_ACTIVATION);
 				request.setOperationTime(new Date());
 				request.setActive(1);
 				requestService.addRequest(request);
 			}
 			userService.addUser(user);
+			userDetailsService.addUserDetails(userDetails);
 			responseDTO.setMessage("User Added Successfully");
 			responseDTO.setStatus(SUCCESS);
 			responseDTO.setStatusCode(200);
@@ -199,5 +207,38 @@ public class LoginUtils {
 			return responseDTO;
 		}
 		return responseDTO;
+	}
+
+	private User fillUser(CreateUserDTO createUser) {
+		User user = new User();
+		user.setCreatedOn(new Date());
+		user.setPassword(createUser.getPassword());
+		user.setRole(createUser.getDesignation());
+		user.setUsername(createUser.getUsername());
+		if (user.getRole().equals("Project Manager")) {
+			user.setLocked(0);
+			user.setActive(1);
+			user.setApprovedOn(new Date());
+			user.setActionBy(user.getUsername());
+			user.setReason("Auto approval for designation of project manager and above");
+		} else {
+			user.setLocked(0);
+			user.setActive(0);
+		}
+		return user;
+	}
+
+	private UserDetails fillUserDetails(CreateUserDTO createUser) {
+		UserDetails userDetails = new UserDetails();
+		userDetails.setEmpId(createUser.getEmpId());
+		userDetails.setDepartmentName(createUser.getDepartmentName());
+		userDetails.setDesignation(createUser.getDesignation());
+		userDetails.setEmailId(createUser.getEmailId());
+		userDetails.setFirstName(createUser.getFirstName());
+		userDetails.setGender(createUser.getGender());
+		userDetails.setLastName(createUser.getLastName());
+		userDetails.setReportingTo(createUser.getReportingTo());
+		userDetails.setUsername(createUser.getUsername());
+		return userDetails;
 	}
 }

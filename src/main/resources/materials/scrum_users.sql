@@ -8,18 +8,12 @@ DROP TABLE IF EXISTS `scrum_users`;
 CREATE TABLE `scrum_users` (
   `username` varchar(30) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `emp_id` varchar(10) NOT NULL unique,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `gender` varchar(10) NOT NULL,
-  `department_name` varchar(50) NOT NULL,
   `role` varchar(50) NOT NULL,
-  `email_id` varchar(255) NOT NULL,
-  `reporting_to` varchar(10) NOT NULL,
   `created_on` datetime NOT NULL,
-  `approved_on` datetime default NULL,
-  `reason` varchar(255) default NULL,
-  `active` numeric(1) NOT NULL check(active in (0,1)),
+  `approved_on` datetime DEFAULT NULL,
+  `action_by` varchar(30) DEFAULT NULL,
+  `reason` varchar(2000) DEFAULT NULL,
   `locked` numeric(1) NOT NULL check(locked in (0,1)),
+  `active` numeric(1) NOT NULL check(active in (0,1)),
   PRIMARY KEY (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;

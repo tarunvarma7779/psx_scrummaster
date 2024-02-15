@@ -1,18 +1,18 @@
 package com.posidex.dto;
 
 import com.posidex.entity.Request;
-import com.posidex.entity.User;
+import com.posidex.entity.UserDetails;
 
 public class ProfileRequestDTO {
-	private User user;
+	private UserDetails userDetails;
 	private Request request;
 
-	public User getUser() {
-		return user;
+	public UserDetails getUserDetails() {
+		return userDetails;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserDetails(UserDetails userDetails) {
+		this.userDetails = userDetails;
 	}
 
 	public Request getRequest() {
@@ -25,12 +25,12 @@ public class ProfileRequestDTO {
 
 	@Override
 	public String toString() {
-		return "ProfileRequestDTO [user=" + user + ", request=" + request + "]";
+		return "ProfileRequestDTO [userDetails=" + userDetails + ", request=" + request + "]";
 	}
 
-	public ProfileRequestDTO(User user, Request request) {
+	public ProfileRequestDTO(UserDetails userDetails, Request request) {
 		super();
-		this.user = user;
+		this.userDetails = userDetails;
 		this.request = request;
 	}
 

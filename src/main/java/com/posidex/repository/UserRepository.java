@@ -10,6 +10,6 @@ import com.posidex.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-	@Query(value = "SELECT * FROM scrum_users u WHERE u.reporting_to = ?1 and u.active = 0 and u.locked = 0", nativeQuery = true)
-	List<User> getInactiveUserforReporting(String username);
+	@Query(value = "SELECT * FROM scrum_users u WHERE u.active = 0 and u.locked = 0", nativeQuery = true)
+	List<User> getInactiveUsers();
 }

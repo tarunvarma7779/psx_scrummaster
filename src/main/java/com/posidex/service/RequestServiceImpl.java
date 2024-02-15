@@ -13,6 +13,7 @@ import com.posidex.dto.ProfileRequestDTO;
 import com.posidex.dto.ResponseDTO;
 import com.posidex.entity.Request;
 import com.posidex.entity.User;
+import com.posidex.entity.UserDetails;
 import com.posidex.repository.RequestRepository;
 import com.posidex.repository.UserRepository;
 import com.posidex.util.LoginUtils;
@@ -27,6 +28,9 @@ public class RequestServiceImpl implements RequestServiceI {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	UserDetailsServiceI userDetailsService;
 
 	@Autowired
 	private UserServiceI userService;
@@ -49,9 +53,10 @@ public class RequestServiceImpl implements RequestServiceI {
 	@Override
 	public List<ProfileRequestDTO> getProfileRequests(String currentUser) {
 		List<ProfileRequestDTO> retValue = new ArrayList<>();
-		List<User> inactiveUserList = userRepository.getInactiveUserforReporting(currentUser);
-		inactiveUserList
-				.forEach(x -> retValue.add(new ProfileRequestDTO(x, getProfileActivationRequests(x.getUsername()))));
+		List<User> inactiveUsersList = userRepository.getInactiveUsers();
+		inactiveUsersList.forEach(
+				x -> retValue.add(new ProfileRequestDTO(userDetailsService.getUserDetailsByUsername(x.getUsername()),
+						getProfileActivationRequests(x.getUsername()))));
 		return retValue;
 	}
 
@@ -65,9 +70,10 @@ public class RequestServiceImpl implements RequestServiceI {
 		try {
 			User user = userService.getUserByUserName(dataMap.get("username"));
 			Request request = getRequestByRequestID(dataMap.get("requestId"));
-			user.setActive(1);
 			user.setLocked(0);
+			user.setActive(1);
 			user.setApprovedOn(new Date());
+			user.setActionBy(dataMap.get("actionBy"));
 			user.setReason(dataMap.get("message"));
 			request.setActive(0);
 			userRepository.save(user);
@@ -89,9 +95,9 @@ public class RequestServiceImpl implements RequestServiceI {
 		try {
 			User user = userService.getUserByUserName(dataMap.get("username"));
 			Request request = getRequestByRequestID(dataMap.get("requestId"));
-			user.setActive(0);
 			user.setLocked(1);
 			user.setReason(dataMap.get("message"));
+			user.setActionBy(dataMap.get("actionBy"));
 			request.setActive(0);
 			userRepository.save(user);
 			requestRepository.save(request);

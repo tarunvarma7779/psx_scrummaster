@@ -22,64 +22,56 @@ public class User implements UserDetails {
 	private String username;
 	@Column(name = "password")
 	private String password;
-	@Column(name = "emp_id")
-	private String empId;
-	@Column(name = "first_name")
-	private String firstName;
-	@Column(name = "last_name")
-	private String lastName;
-	@Column(name = "department_name")
-	private String departmentName;
 	@Column(name = "role")
 	private String role;
-	@Column(name = "email_id")
-	private String emailId;
-	@Column(name = "reporting_to")
-	private String reportingTo;
 	@Column(name = "created_on")
 	private Date createdOn;
 	@Column(name = "approved_on")
 	private Date approvedOn;
-	@Column(name = "active")
-	private int active;
-	@Column(name = "locked")
-	private int locked;
-	@Column(name = "gender")
-	private String gender;
+	@Column(name = "action_by")
+	private String actionBy;
 	@Column(name = "reason")
 	private String reason;
+	@Column(name = "locked")
+	private int locked;
+	@Column(name = "active")
+	private int active;
 
 	public User() {
 		super();
 	}
 
-	public User(String username, String password, String empId, String firstName, String lastName,
-			String departmentName, String role, String emailId, String reportingTo, Date createdOn, Date approvedOn,
-			int active, int locked, String gender, String reason) {
+	public User(String username, String password, String role, Date createdOn, Date approvedOn, String actionBy,
+			String reason, int locked,int active) {
 		super();
 		this.username = username;
 		this.password = password;
-		this.empId = empId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.departmentName = departmentName;
 		this.role = role;
-		this.emailId = emailId;
-		this.reportingTo = reportingTo;
 		this.createdOn = createdOn;
 		this.approvedOn = approvedOn;
-		this.active = active;
-		this.locked = locked;
-		this.gender = gender;
+		this.actionBy = actionBy;
 		this.reason = reason;
+		this.locked = locked;
+		this.active=active;
 	}
 
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + ", empId=" + empId + ", firstName=" + firstName
-				+ ", lastName=" + lastName + ", departmentName=" + departmentName + ", role=" + role + ", emailId="
-				+ emailId + ", reportingTo=" + reportingTo + ", createdOn=" + createdOn + ", approvedOn=" + approvedOn
-				+ ", active=" + active + ", locked=" + locked + ", gender=" + gender + ", reason=" + reason + "]";
+		return "User [username=" + username + ", password=" + password + ", role=" + role + ", createdOn=" + createdOn
+				+ ", approvedOn=" + approvedOn + ", actionBy=" + actionBy + ", reason=" + reason + ", active=" + active + ", locked="
+				+ locked + "]";
+	}
+	
+	public int getActive() {
+		return active;
+	}
+
+	public void setActive(int active) {
+		this.active = active;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public String getUsername() {
@@ -90,68 +82,12 @@ public class User implements UserDetails {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getEmpId() {
-		return empId;
-	}
-
-	public void setEmpId(String empId) {
-		this.empId = empId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getDepartmentName() {
-		return departmentName;
-	}
-
-	public void setDepartmentName(String departmentName) {
-		this.departmentName = departmentName;
-	}
-
 	public String getRole() {
 		return role;
 	}
 
 	public void setRole(String role) {
 		this.role = role;
-	}
-
-	public String getEmailId() {
-		return emailId;
-	}
-
-	public void setEmailId(String emailId) {
-		this.emailId = emailId;
-	}
-
-	public String getReportingTo() {
-		return reportingTo;
-	}
-
-	public void setReportingTo(String reportingTo) {
-		this.reportingTo = reportingTo;
 	}
 
 	public Date getCreatedOn() {
@@ -170,12 +106,20 @@ public class User implements UserDetails {
 		this.approvedOn = approvedOn;
 	}
 
-	public int getActive() {
-		return active;
+	public String getActionBy() {
+		return actionBy;
 	}
 
-	public void setActive(int active) {
-		this.active = active;
+	public void setActionBy(String actionBy) {
+		this.actionBy = actionBy;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	public int getLocked() {
@@ -186,20 +130,8 @@ public class User implements UserDetails {
 		this.locked = locked;
 	}
 
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-	public String getReason() {
-		return reason;
-	}
-
-	public void setReason(String reason) {
-		this.reason = reason;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Override
