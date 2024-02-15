@@ -14,7 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "psx_users")
+@Table(name = "scrum_users")
 public class User implements UserDetails {
 
 	@Id
@@ -46,6 +46,41 @@ public class User implements UserDetails {
 	private int locked;
 	@Column(name = "gender")
 	private String gender;
+	@Column(name = "reason")
+	private String reason;
+
+	public User() {
+		super();
+	}
+
+	public User(String username, String password, String empId, String firstName, String lastName,
+			String departmentName, String role, String emailId, String reportingTo, Date createdOn, Date approvedOn,
+			int active, int locked, String gender, String reason) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.empId = empId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.departmentName = departmentName;
+		this.role = role;
+		this.emailId = emailId;
+		this.reportingTo = reportingTo;
+		this.createdOn = createdOn;
+		this.approvedOn = approvedOn;
+		this.active = active;
+		this.locked = locked;
+		this.gender = gender;
+		this.reason = reason;
+	}
+
+	@Override
+	public String toString() {
+		return "User [username=" + username + ", password=" + password + ", empId=" + empId + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", departmentName=" + departmentName + ", role=" + role + ", emailId="
+				+ emailId + ", reportingTo=" + reportingTo + ", createdOn=" + createdOn + ", approvedOn=" + approvedOn
+				+ ", active=" + active + ", locked=" + locked + ", gender=" + gender + ", reason=" + reason + "]";
+	}
 
 	public String getUsername() {
 		return username;
@@ -143,12 +178,12 @@ public class User implements UserDetails {
 		this.active = active;
 	}
 
-	public int getlocked() {
+	public int getLocked() {
 		return locked;
 	}
 
-	public void setlocked(int suspended) {
-		this.locked = suspended;
+	public void setLocked(int locked) {
+		this.locked = locked;
 	}
 
 	public String getGender() {
@@ -159,27 +194,12 @@ public class User implements UserDetails {
 		this.gender = gender;
 	}
 
-	public User(String userId, String password, String empId, String firstName, String lastName, String departmentName,
-			String role, String emailId, String reportingTo, Date createdOn, Date approvedOn, int active, int locked,
-			String gender) {
-		this.username = userId;
-		this.password = password;
-		this.empId = empId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.departmentName = departmentName;
-		this.role = role;
-		this.emailId = emailId;
-		this.reportingTo = reportingTo;
-		this.createdOn = createdOn;
-		this.approvedOn = approvedOn;
-		this.active = active;
-		this.locked = locked;
-		this.gender = gender;
+	public String getReason() {
+		return reason;
 	}
 
-	public User() {
-		super();
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 	@Override

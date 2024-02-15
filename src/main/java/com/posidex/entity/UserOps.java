@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "psx_userops")
+@Table(name = "scrum_userops")
 public class UserOps {
 
 	@EmbeddedId

@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "psx_requests")
+@Table(name = "scrum_requests")
 public class Request {
 	@Id
 	@Column(name = "request_id")

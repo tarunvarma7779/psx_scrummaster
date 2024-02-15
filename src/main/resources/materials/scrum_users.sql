@@ -1,11 +1,11 @@
 CREATE DATABASE  IF NOT EXISTS `scrummaster`;
 USE `scrummaster`;
 --
--- Table structure for table `psx_users`
+-- Table structure for table `scrum_users`
 --
-DROP TABLE IF EXISTS `psx_users`;
+DROP TABLE IF EXISTS `scrum_users`;
 
-CREATE TABLE `psx_users` (
+CREATE TABLE `scrum_users` (
   `username` varchar(30) NOT NULL,
   `password` varchar(255) NOT NULL,
   `emp_id` varchar(10) NOT NULL unique,
@@ -18,6 +18,7 @@ CREATE TABLE `psx_users` (
   `reporting_to` varchar(10) NOT NULL,
   `created_on` datetime NOT NULL,
   `approved_on` datetime default NULL,
+  `reason` varchar(255) default NULL,
   `active` numeric(1) NOT NULL check(active in (0,1)),
   `locked` numeric(1) NOT NULL check(locked in (0,1)),
   PRIMARY KEY (`username`)

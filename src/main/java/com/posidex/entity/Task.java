@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "psx_tasks")
+@Table(name = "scrum_tasks")
 public class Task {
 
 	@Id
