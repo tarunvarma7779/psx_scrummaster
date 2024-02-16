@@ -13,7 +13,7 @@ public interface RequestServiceI {
 	
 	public Request getRequestByRequestID(String requestId);
 		
-	public List<ProfileRequestDTO> getProfileRequests(String currentUser);
+	public List<ProfileRequestDTO> getProfileRequests(String username);
 	
 	public ResponseDTO approveUser(Map<String,String> dataMap);
 	

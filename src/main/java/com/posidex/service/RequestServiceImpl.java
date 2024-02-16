@@ -51,12 +51,16 @@ public class RequestServiceImpl implements RequestServiceI {
 	}
 
 	@Override
-	public List<ProfileRequestDTO> getProfileRequests(String currentUser) {
+	public List<ProfileRequestDTO> getProfileRequests(String username) {
 		List<ProfileRequestDTO> retValue = new ArrayList<>();
+		UserDetails currentUser = userDetailsService.getUserDetailsByUsername(username);
 		List<User> inactiveUsersList = userRepository.getInactiveUsers();
-		inactiveUsersList.forEach(
-				x -> retValue.add(new ProfileRequestDTO(userDetailsService.getUserDetailsByUsername(x.getUsername()),
-						getProfileActivationRequests(x.getUsername()))));
+		inactiveUsersList.forEach(x -> {
+			UserDetails tempUserDetails = userDetailsService.getUserDetailsByUsername(x.getUsername());
+			if (tempUserDetails.getReportingTo().equals(currentUser.getEmpId())) {
+				retValue.add(new ProfileRequestDTO(tempUserDetails, getProfileActivationRequests(x.getUsername())));
+			}
+		});
 		return retValue;
 	}
 
@@ -78,11 +82,11 @@ public class RequestServiceImpl implements RequestServiceI {
 			request.setActive(0);
 			userRepository.save(user);
 			requestRepository.save(request);
-			response.setMessage("User Activated");
+			response.setMessage("User Approved");
 			response.setStatusCode(200);
 			response.setStatus(LoginUtils.SUCCESS);
 		} catch (Exception e) {
-			response.setMessage("User Activation Failed");
+			response.setMessage("User Approval Failed");
 			response.setStatusCode(100);
 			response.setStatus(LoginUtils.FAILED);
 		}
