@@ -1,6 +1,7 @@
 package com.posidex.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,4 +29,8 @@ public class ProfileController {
 		return userDetailsService.getReportees(username);
 	}
 	
+	@GetMapping("/getTeam")
+	public Map<String,List<UserDetails>> getTeam(@RequestParam String username) {
+		return userDetailsService.getTeamMemberDetatils(username);
+	}
 }
