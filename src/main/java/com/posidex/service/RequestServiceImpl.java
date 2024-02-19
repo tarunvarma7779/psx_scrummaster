@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.posidex.dto.ProfileRequestDTO;
 import com.posidex.dto.ResponseDTO;
-import com.posidex.entity.Request;
+import com.posidex.entity.UserActivation;
 import com.posidex.entity.User;
 import com.posidex.entity.UserDetails;
-import com.posidex.repository.RequestRepository;
+import com.posidex.repository.UserRequestRepository;
 import com.posidex.repository.UserRepository;
 import com.posidex.util.LoginUtils;
 
@@ -24,7 +24,7 @@ import jakarta.transaction.Transactional;
 public class RequestServiceImpl implements RequestServiceI {
 
 	@Autowired
-	private RequestRepository requestRepository;
+	private UserRequestRepository requestRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -37,13 +37,13 @@ public class RequestServiceImpl implements RequestServiceI {
 
 	@Transactional
 	@Override
-	public void addRequest(Request request) {
+	public void addRequest(UserActivation request) {
 		requestRepository.save(request);
 	}
 
 	@Override
-	public Request getRequestByRequestID(String requestId) {
-		Optional<Request> result = requestRepository.findById(requestId);
+	public UserActivation getRequestByRequestID(String requestId) {
+		Optional<UserActivation> result = requestRepository.findById(requestId);
 		if (result.isPresent()) {
 			return result.get();
 		}
@@ -64,8 +64,8 @@ public class RequestServiceImpl implements RequestServiceI {
 		return retValue;
 	}
 
-	public Request getProfileActivationRequests(String username) {
-		return requestRepository.getRequestsBasedOnUserAndOperation(username, LoginUtils.USER_ACTIVATION);
+	public UserActivation getProfileActivationRequests(String username) {
+		return requestRepository.getRequestsBasedOnUserAndOperation(username);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class RequestServiceImpl implements RequestServiceI {
 		ResponseDTO response = new ResponseDTO();
 		try {
 			User user = userService.getUserByUserName(dataMap.get("username"));
-			Request request = getRequestByRequestID(dataMap.get("requestId"));
+			UserActivation request = getRequestByRequestID(dataMap.get("requestId"));
 			user.setLocked(0);
 			user.setActive(1);
 			user.setApprovedOn(new Date());
@@ -98,7 +98,7 @@ public class RequestServiceImpl implements RequestServiceI {
 		ResponseDTO response = new ResponseDTO();
 		try {
 			User user = userService.getUserByUserName(dataMap.get("username"));
-			Request request = getRequestByRequestID(dataMap.get("requestId"));
+			UserActivation request = getRequestByRequestID(dataMap.get("requestId"));
 			user.setLocked(1);
 			user.setReason(dataMap.get("message"));
 			user.setActionBy(dataMap.get("actionBy"));

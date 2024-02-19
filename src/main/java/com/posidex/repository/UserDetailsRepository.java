@@ -12,10 +12,10 @@ public interface UserDetailsRepository extends JpaRepository<UserDetails, String
 	@Query(value = "SELECT * FROM scrum_user_details u WHERE u.username = ?1 ", nativeQuery = true)
 	public UserDetails getUserDetailsByUsername(String username);
 	
-	@Query(value = "SELECT * FROM scrum_user_details u WHERE u.reporting_to = ?1 ", nativeQuery = true)
+	@Query(value = "SELECT ud.* FROM scrum_user_details ud INNER JOIN scrum_users u WHERE ud.username = u.username AND u.active=1 AND ud.reporting_to = ?1 ", nativeQuery = true)
 	public List<UserDetails> getReporteesByEmpID(String empId);
 	
-	@Query(value = "SELECT * FROM scrum_user_details u WHERE u.department_name = ?1 ", nativeQuery = true)
+	@Query(value = "SELECT ud.* FROM scrum_user_details ud INNER JOIN scrum_users u WHERE ud.username = u.username AND u.active=1 AND ud.department_name=?1 ", nativeQuery = true)
 	public List<UserDetails> getTeamMembersByDepartment(String department);
 	
 }

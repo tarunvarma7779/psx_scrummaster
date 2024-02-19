@@ -15,7 +15,7 @@ import com.posidex.dto.CreateUserDTO;
 import com.posidex.dto.JwtRequest;
 import com.posidex.dto.JwtResponse;
 import com.posidex.dto.ResponseDTO;
-import com.posidex.entity.Request;
+import com.posidex.entity.UserActivation;
 import com.posidex.entity.User;
 import com.posidex.entity.UserDetails;
 import com.posidex.entity.UserOps;
@@ -186,11 +186,10 @@ public class LoginUtils {
 			User user = fillUser(createUser);
 			UserDetails userDetails = fillUserDetails(createUser);
 			if (user.getActive() == 0) {
-				Request request = new Request();
+				UserActivation request = new UserActivation();
 				request.setRequestId("req_" + System.currentTimeMillis());
 				request.setRaisedBy(userDetails.getEmpId());
 				request.setRaisedTo(userDetails.getReportingTo());
-				request.setOperationType(USER_ACTIVATION);
 				request.setOperationTime(new Date());
 				request.setActive(1);
 				requestService.addRequest(request);
