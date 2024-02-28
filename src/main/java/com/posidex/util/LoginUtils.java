@@ -29,14 +29,6 @@ import com.posidex.util.StringEncrypter.EncryptionException;
 @Component
 public class LoginUtils {
 
-	public static final String SUCCESS = "SUCCESS";
-	public static final String FAILED = "FAILED";
-	public static final String LOGIN_SUCCESS = "LOGIN SUCCESS";
-	public static final String LOGIN_FAILED = "LOGIN FAILED";
-	public static final String LOGOUT = "LOGOUT";
-	public static final String INVALID = "INVALID";
-	public static final String USER_ACTIVATION = "USER ACTIVATION";
-
 	private static Logger logger = Logger.getLogger(LoginUtils.class.getName());
 
 	@Autowired
@@ -63,8 +55,8 @@ public class LoginUtils {
 		});
 		List<UserOps> lastUnsuccessful = new ArrayList<>();
 		for (UserOps op : userOpsList) {
-			if (op.getOperationType().equals(LoginUtils.LOGOUT)
-					|| op.getOperationType().equals(LoginUtils.LOGIN_SUCCESS)) {
+			if (op.getOperationType().equals(CommonStringUtils.LOGOUT)
+					|| op.getOperationType().equals(CommonStringUtils.LOGIN_SUCCESS)) {
 				break;
 			} else {
 				lastUnsuccessful.add(op);
@@ -83,7 +75,7 @@ public class LoginUtils {
 			}
 		});
 		for (UserOps op : userOpsList) {
-			if (op.getOperationType().equals(LoginUtils.LOGIN_FAILED)) {
+			if (op.getOperationType().equals(CommonStringUtils.LOGIN_FAILED)) {
 				return op.getUserOpsIdentity().getOperationTime().getTime();
 			}
 		}
@@ -99,8 +91,8 @@ public class LoginUtils {
 		if (user != null && user.getActive() == 1) {
 			validateUserCredentials(user, request, response, userOps);
 		} else {
-			userOps.setOperationType(LOGIN_FAILED);
-			userOps.setRole((user != null && user.getActive() == 0) ? user.getRole() : INVALID);
+			userOps.setOperationType(CommonStringUtils.LOGIN_FAILED);
+			userOps.setRole((user != null && user.getActive() == 0) ? user.getRole() : CommonStringUtils.INVALID);
 			userOpsService.addUserOps(userOps);
 			response.setJwtToken(null);
 			response.setMessage(
@@ -127,7 +119,7 @@ public class LoginUtils {
 			response.setUserDetails(null);
 		} else {
 			if (validatePassword(request.getPassword(), user)) {
-				userOps.setOperationType(LOGIN_SUCCESS);
+				userOps.setOperationType(CommonStringUtils.LOGIN_SUCCESS);
 				userOps.setRole(user.getRole());
 				userOpsService.addUserOps(userOps);
 				response.setJwtToken(token);
@@ -135,7 +127,7 @@ public class LoginUtils {
 				response.setStatusCode(200);
 				response.setUserDetails(userDetailsService.getUserDetailsByUsername(user.getUsername()));
 			} else {
-				userOps.setOperationType(LOGIN_FAILED);
+				userOps.setOperationType(CommonStringUtils.LOGIN_FAILED);
 				userOps.setRole(user.getRole());
 				userOpsService.addUserOps(userOps);
 				response.setJwtToken(null);
@@ -165,17 +157,17 @@ public class LoginUtils {
 			if (userExists || empIdExists || !reportingIdExists) {
 				if (userExists) {
 					responseDTO.setMessage("UserId already exists");
-					responseDTO.setStatus(FAILED);
+					responseDTO.setStatus(CommonStringUtils.FAILED);
 					responseDTO.setStatusCode(410);
 					return responseDTO;
 				} else if (empIdExists) {
 					responseDTO.setMessage("EmpId already exists");
-					responseDTO.setStatus(FAILED);
+					responseDTO.setStatus(CommonStringUtils.FAILED);
 					responseDTO.setStatusCode(420);
 					return responseDTO;
 				} else {
 					responseDTO.setMessage("Reporting id doesnt exists");
-					responseDTO.setStatus(FAILED);
+					responseDTO.setStatus(CommonStringUtils.FAILED);
 					responseDTO.setStatusCode(430);
 					return responseDTO;
 				}
@@ -197,11 +189,11 @@ public class LoginUtils {
 			userService.addUser(user);
 			userDetailsService.addUserDetails(userDetails);
 			responseDTO.setMessage("User Added Successfully");
-			responseDTO.setStatus(SUCCESS);
+			responseDTO.setStatus(CommonStringUtils.SUCCESS);
 			responseDTO.setStatusCode(200);
 		} catch (Exception e) {
 			responseDTO.setMessage(e.getLocalizedMessage());
-			responseDTO.setStatus(FAILED);
+			responseDTO.setStatus(CommonStringUtils.FAILED);
 			responseDTO.setStatusCode(100);
 			return responseDTO;
 		}

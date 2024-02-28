@@ -16,6 +16,7 @@ import com.posidex.entity.User;
 import com.posidex.entity.UserDetails;
 import com.posidex.repository.UserRequestRepository;
 import com.posidex.repository.UserRepository;
+import com.posidex.util.CommonStringUtils;
 import com.posidex.util.LoginUtils;
 
 import jakarta.transaction.Transactional;
@@ -84,11 +85,11 @@ public class RequestServiceImpl implements RequestServiceI {
 			requestRepository.save(request);
 			response.setMessage("User Approved");
 			response.setStatusCode(200);
-			response.setStatus(LoginUtils.SUCCESS);
+			response.setStatus(CommonStringUtils.SUCCESS);
 		} catch (Exception e) {
 			response.setMessage("User Approval Failed");
 			response.setStatusCode(100);
-			response.setStatus(LoginUtils.FAILED);
+			response.setStatus(CommonStringUtils.FAILED);
 		}
 		return response;
 	}
@@ -107,11 +108,11 @@ public class RequestServiceImpl implements RequestServiceI {
 			requestRepository.save(request);
 			response.setMessage("User Rejected");
 			response.setStatusCode(200);
-			response.setStatus(LoginUtils.SUCCESS);
+			response.setStatus(CommonStringUtils.SUCCESS);
 		} catch (Exception e) {
 			response.setMessage("User Rejection Failed");
 			response.setStatusCode(100);
-			response.setStatus(LoginUtils.FAILED);
+			response.setStatus(CommonStringUtils.FAILED);
 		}
 		return response;
 	}
