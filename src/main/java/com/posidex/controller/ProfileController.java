@@ -24,13 +24,13 @@ public class ProfileController {
 		return userDetailsService.getUserDetailsByUsername(username);
 	}
 	
-	@GetMapping("/getReportees")
-	public List<UserDetails> getReportees(@RequestParam String username) {
-		return userDetailsService.getReportees(username);
+	@GetMapping("/getTeam")
+	public Map<String,List<UserDetails>> getTeam(@RequestParam String empId) {
+		return userDetailsService.getTeamMemberDetatils(empId);
 	}
 	
-	@GetMapping("/getTeam")
-	public Map<String,List<UserDetails>> getTeam(@RequestParam String username) {
-		return userDetailsService.getTeamMemberDetatils(username);
+	@GetMapping("/getReportees")
+	public List<UserDetails> getReportees(@RequestParam String empId) {
+		return userDetailsService.getReportees(empId);
 	}
 }

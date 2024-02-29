@@ -11,7 +11,7 @@ public interface UserDetailsServiceI {
 	
 	public UserDetails getUserDetailsByUsername(String username);
 	
-	public List<UserDetails> getReportees(String username);
+	public List<UserDetails> getReportees(String empId);
 	
 	public Map<String,List<UserDetails>> getTeamMemberDetatils(String username);
 

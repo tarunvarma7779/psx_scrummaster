@@ -31,9 +31,8 @@ public class UserDetailsServiceImpl implements UserDetailsServiceI {
 	}
 
 	@Override
-	public List<UserDetails> getReportees(String username) {
-		UserDetails currentUser = getUserDetailsByUsername(username);
-		return userDetailsRepository.getReporteesByEmpID(currentUser.getEmpId());
+	public List<UserDetails> getReportees(String empId) {
+		return userDetailsRepository.getReporteesByEmpID(empId);
 	}
 
 	@Override
