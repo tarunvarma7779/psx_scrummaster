@@ -16,25 +16,25 @@ import com.posidex.service.UserDetailsServiceI;
 
 @Component
 public class TaskUtils {
-	
+
 	@Autowired
 	TaskServiceI taskService;
 	@Autowired
 	UserDetailsServiceI userDetailsService;
-	
+
 	private static int escalatedCount;
-	
+
 	public ResponseDTO createTask(Task task) {
 		ResponseDTO retValue = new ResponseDTO();
-		if(task.getDescription().equals("")) {
+		if (task.getDescription().equals("")) {
 			retValue.setStatus(CommonStringUtils.WARN);
 			retValue.setMessage("Description is empty");
 			retValue.setStatusCode(320);
 			return retValue;
 		}
-		if(validateDeadline(task.getDeadline(), task.getCreatedOn())) {
+		if (validateDeadline(task.getDeadline(), task.getCreatedOn())) {
 			retValue.setStatus(CommonStringUtils.WARN);
-			retValue.setMessage("deadline should be atleast 2 day");
+			retValue.setMessage("deadline should be atleast 1 day");
 			retValue.setStatusCode(310);
 			return retValue;
 		}
@@ -44,40 +44,42 @@ public class TaskUtils {
 		retValue.setStatusCode(200);
 		return retValue;
 	}
-	
-	private static boolean validateDeadline(Date d1 , Date d2) {
+
+	private static boolean validateDeadline(Date d1, Date d2) {
 		long differenceInMilliseconds = d1.getTime() - d2.getTime();
-        long differenceInDays = differenceInMilliseconds / (24 * 60 * 60 * 1000);
-        return differenceInDays < 2;
+		long differenceInDays = differenceInMilliseconds / (24 * 60 * 60 * 1000);
+		return differenceInDays < 1;
 	}
 
 	public TableDTO getAssignedByMe(String empId) {
 		TableDTO retValue = new TableDTO();
 		retValue.setHeaders("SNo::Reportee::Assigned::Completed::Pending::Escalation".split("::"));
-		List<UserDetails> reportees = new ArrayList<>();
-		reportees = userDetailsService.getReportees(empId);
+		List<UserDetails> reportees = userDetailsService.getReportees(empId);
 		List<String[]> records = new ArrayList<>();
-		reportees.forEach(x->{
+		reportees.forEach(x -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(x.getFirstName()+" "+ x.getLastName()+",");
-			sb.append(taskService.getAssignedTasks(x.getEmpId()).size()+",");
-			sb.append(taskService.getCompletedTasks(x.getEmpId()).size()+",");
-			sb.append(taskService.getPendingTasks(x.getEmpId()).size()+",");
+			sb.append(x.getFirstName() + " " + x.getLastName() + ",");
+			sb.append(taskService.getAssignedTasks(x.getEmpId()).size() + ",");
+			sb.append(taskService.getCompletedTasks(x.getEmpId()).size() + ",");
+			sb.append(taskService.getPendingTasks(x.getEmpId()).size() + ",");
 			sb.append(getEscalatedCount(taskService.getAssignedTasks(x.getEmpId())));
 			records.add(sb.toString().split(","));
 		});
-		retValue.setRecords(records);		
+		retValue.setRecords(records);
 		return retValue;
 	}
 
-	private int getEscalatedCount(List<Task> assignedTasks) {
+	private static int getEscalatedCount(List<Task> assignedTasks) {
 		escalatedCount = 0;
-		assignedTasks.forEach(x->{
-			if(x.getClosedOn()!=null && (x.getClosedOn().compareTo(x.getDeadline()))>0) {
-				escalatedCount++;
-			}
-			else if(x.getDeadline().compareTo(new Date())<0) {
-				escalatedCount++;
+		assignedTasks.forEach(x -> {
+			if (x.getClosedOn() != null) {
+				if (x.getClosedOn().compareTo(x.getDeadline()) > 0) {
+					escalatedCount++;
+				}
+			} else {
+				if (x.getDeadline().compareTo(new Date()) < 0) {
+					escalatedCount++;
+				}
 			}
 		});
 		return escalatedCount;
@@ -88,11 +90,11 @@ public class TaskUtils {
 		retValue.setHeaders("SNo::TaskId::TaskName".split("::"));
 		List<String[]> records = new ArrayList<>();
 		List<Task> tasks = taskService.getAssignedTasks(empId);
-		tasks.forEach(x->{
+		tasks.forEach(x -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(x.getTaskId()+",");
+			sb.append(x.getTaskId() + ",");
 			sb.append(x.getTaskName());
-			records.add(sb.toString().split(","));			
+			records.add(sb.toString().split(","));
 		});
 		retValue.setRecords(records);
 		return retValue;
