@@ -33,4 +33,9 @@ public class TaskServiceImpl implements TaskServiceI {
 	public List<Task> getPendingTasks(String empId) {
 		return taskRepository.getPendingTasksBasedOnEmpId(empId);
 	}
+
+	@Override
+	public List<Task> getTeamTasks(String empId) {
+		return taskRepository.getTeamTasksBasedOnEmpId(empId);
+	}
 }

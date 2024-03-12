@@ -100,4 +100,8 @@ public class TaskUtils {
 		return retValue;
 	}
 
+	public List<Task> getTeamTasks(String empId) {
+		return taskService.getTeamTasks(empId);
+	}
+
 }

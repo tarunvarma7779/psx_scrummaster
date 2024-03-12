@@ -14,4 +14,6 @@ public interface TaskServiceI {
 	public List<Task> getCompletedTasks(String empId);
 	
 	public List<Task> getPendingTasks(String empId);
+
+	public List<Task> getTeamTasks(String empId);
 }

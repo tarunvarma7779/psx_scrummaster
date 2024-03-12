@@ -1,5 +1,7 @@
 package com.posidex.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,5 +36,9 @@ public class TaskController {
 	public TableDTO getAssignedToMe(@RequestParam String empId) {
 		return taskUtils.getAssignedToMe(empId);
 	}
-
+	
+	@GetMapping("/getTeamTasks")
+	public List<Task> getTeamTasks(@RequestParam String empId) {
+		return taskUtils.getTeamTasks(empId);
+	}
 }
