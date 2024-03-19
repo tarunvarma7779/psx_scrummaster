@@ -23,6 +23,7 @@ public class TaskUtils {
 	UserDetailsServiceI userDetailsService;
 
 	private static int escalatedCount;
+	private final static String commaSeperator = ",";
 
 	public ResponseDTO createTask(Task task) {
 		ResponseDTO retValue = new ResponseDTO();
@@ -53,17 +54,17 @@ public class TaskUtils {
 
 	public TableDTO getAssignedByMe(String empId) {
 		TableDTO retValue = new TableDTO();
-		retValue.setHeaders("SNo::Reportee::Assigned::Completed::Pending::Escalation".split("::"));
+		retValue.setHeaders("Reportee::Assigned::Completed::Pending::Escalation".split("::"));
 		List<UserDetails> reportees = userDetailsService.getReportees(empId);
 		List<String[]> records = new ArrayList<>();
 		reportees.forEach(x -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(x.getFirstName() + " " + x.getLastName() + ",");
-			sb.append(taskService.getAssignedTasks(x.getEmpId()).size() + ",");
-			sb.append(taskService.getCompletedTasks(x.getEmpId()).size() + ",");
-			sb.append(taskService.getPendingTasks(x.getEmpId()).size() + ",");
+			sb.append(x.getFirstName() + " " + x.getLastName() + commaSeperator);
+			sb.append(taskService.getAssignedTasks(x.getEmpId()).size() + commaSeperator);
+			sb.append(taskService.getCompletedTasks(x.getEmpId()).size() + commaSeperator);
+			sb.append(taskService.getPendingTasks(x.getEmpId()).size() + commaSeperator);
 			sb.append(getEscalatedCount(taskService.getAssignedTasks(x.getEmpId())));
-			records.add(sb.toString().split(","));
+			records.add(sb.toString().split(commaSeperator));
 		});
 		retValue.setRecords(records);
 		return retValue;
@@ -87,14 +88,16 @@ public class TaskUtils {
 
 	public TableDTO getAssignedToMe(String empId) {
 		TableDTO retValue = new TableDTO();
-		retValue.setHeaders("SNo::TaskId::TaskName".split("::"));
+		retValue.setHeaders("TaskId::TaskName::Assigned By::Deadline".split("::"));
 		List<String[]> records = new ArrayList<>();
 		List<Task> tasks = taskService.getAssignedTasks(empId);
 		tasks.forEach(x -> {
 			StringBuilder sb = new StringBuilder();
-			sb.append(x.getTaskId() + ",");
-			sb.append(x.getTaskName());
-			records.add(sb.toString().split(","));
+			sb.append(x.getTaskId() + commaSeperator);
+			sb.append(x.getTaskName() + commaSeperator);
+			sb.append(x.getAssignedBy() + commaSeperator);
+			sb.append(CommonUtils.dateToString(x.getDeadline()) + commaSeperator);
+			records.add(sb.toString().split(commaSeperator));
 		});
 		retValue.setRecords(records);
 		return retValue;
